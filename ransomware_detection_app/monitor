@@ -1,0 +1,1 @@
+thread = threading.Thread(target=monitor_directory, args=(os.path.join(os.getcwd(), 'monitor'),))
