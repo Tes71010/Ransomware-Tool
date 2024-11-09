@@ -7,6 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; }
         #alert { margin-top: 20px; }
+        .message { padding: 10px; border: 1px solid #ccc; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -14,12 +15,25 @@
     <button onclick="startMonitoring()">Start Monitoring</button>
     <button onclick="stopMonitoring()">Stop Monitoring</button>
     <div id="alert"></div>
+
     <script>
+        function displayMessage(message, isError = false) {
+            const alertDiv = document.getElementById('alert');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.style.color = isError ? 'red' : 'black';
+            messageDiv.innerText = message;
+            alertDiv.appendChild(messageDiv);
+        }
+
         function startMonitoring() {
             fetch('/start-monitoring')
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById('alert').innerText = data;
+                    displayMessage(data);
+                })
+                .catch(error => {
+                    displayMessage("Failed to start monitoring: " + error.message, true);
                 });
         }
 
@@ -27,17 +41,24 @@
             fetch('/stop-monitoring')
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById('alert').innerText = data;
+                    displayMessage(data);
+                })
+                .catch(error => {
+                    displayMessage("Failed to stop monitoring: " + error.message, true);
                 });
         }
 
+        // Poll for status updates every 5 seconds
         setInterval(() => {
             fetch('/status')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status) {
-                        document.getElementById('alert').innerText = data.status;
+                        displayMessage(data.status);
                     }
+                })
+                .catch(error => {
+                    displayMessage("Failed to retrieve status: " + error.message, true);
                 });
         }, 5000); // Check every 5 seconds
     </script>
