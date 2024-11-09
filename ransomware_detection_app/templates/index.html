@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ransomware Detection Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #alert { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ransomware Detection Tool</h1>
+    <button onclick="startMonitoring()">Start Monitoring</button>
+    <button onclick="stopMonitoring()">Stop Monitoring</button>
+    <div id="alert"></div>
+    <script>
+        function startMonitoring() {
+            fetch('/start-monitoring')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('alert').innerText = data;
+                });
+        }
+
+        function stopMonitoring() {
+            fetch('/stop-monitoring')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('alert').innerText = data;
+                });
+        }
+
+        setInterval(() => {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        document.getElementById('alert').innerText = data.status;
+                    }
+                });
+        }, 5000); // Check every 5 seconds
+    </script>
+</body>
+</html>
