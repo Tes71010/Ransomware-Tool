@@ -8,12 +8,13 @@ from flask import render_template
 
 app = Flask(__name__)
 
-# Global variable to store monitoring status
+# Global variables to store monitoring status and result
 monitoring_active = False
 monitoring_result = ""
 
 
 def monitor_directory(path):
+    """Monitor the specified directory for new files."""
     global monitoring_result
     before = set(os.listdir(path))
     while monitoring_active:
@@ -21,13 +22,17 @@ def monitor_directory(path):
         after = set(os.listdir(path))
         added = after - before
         if added:
-            monitoring_result = f"New files added: {added}"
+            monitoring_result = f"New files added: {', '.join(added)}"
             before = after  # Update the before set
+        else:
+            monitoring_result = "No new files detected."
 
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template(
+        "index.html"
+    )  # Requires an "index.html" file in the templates folder
 
 
 @app.route("/start-monitoring")
@@ -37,6 +42,7 @@ def start_monitoring():
         monitoring_active = True
         # Start the monitoring in a separate thread
         thread = threading.Thread(target=monitor_directory, args=("/path/to/monitor",))
+        thread.daemon = True  # Daemonize thread to close it with the main program
         thread.start()
         return "Monitoring started."
     else:
