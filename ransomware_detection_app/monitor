@@ -1,1 +1,13 @@
+import threading
+import os
+
+def monitor_directory(directory_path):
+    """Monitors the specified directory for changes."""
+    for entry in os.scandir(directory_path):
+        # Process each entry in the directory (e.g., check for file modifications)
+        print(f"Entry: {entry.name}")
+        # ... your monitoring logic here ...
+
+# ... (rest of your code) ...
 thread = threading.Thread(target=monitor_directory, args=(os.path.join(os.getcwd(), 'monitor'),))
+thread.start()
